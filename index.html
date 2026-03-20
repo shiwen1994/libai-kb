@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>李白诗选 · 知识库</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Serif SC", serif;
+  background: #0d0d14;
+  color: #e8e0d0;
+  min-height: 100vh;
+}
+
+/* ── 头部 ── */
+header {
+  text-align: center;
+  padding: 48px 20px 32px;
+  background: linear-gradient(180deg, #1a1a2e 0%, #0d0d14 100%);
+  border-bottom: 1px solid rgba(240,208,128,0.12);
+}
+header h1 {
+  font-size: 28px;
+  font-weight: 400;
+  color: #f0d080;
+  letter-spacing: 8px;
+  margin-bottom: 6px;
+}
+header p {
+  font-size: 13px;
+  color: #666;
+  letter-spacing: 2px;
+}
+
+/* ── 搜索 ── */
+.search-bar {
+  max-width: 520px;
+  margin: 0 auto 32px;
+  display: flex;
+  gap: 10px;
+}
+#searchInput {
+  flex: 1;
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(240,208,128,0.2);
+  border-radius: 30px;
+  color: #e8e0d0;
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#searchInput::placeholder { color: #555; }
+#searchInput:focus { border-color: rgba(240,208,128,0.5); }
+
+#filterTag {
+  padding: 12px 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(240,208,128,0.2);
+  border-radius: 30px;
+  color: #e8e0d0;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23f0d080' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+#filterTag option { background: #1a1a2e; }
+
+/* ── 诗歌列表 ── */
+#poemList {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+.poem-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 22px 26px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.poem-item:hover {
+  background: rgba(240,208,128,0.06);
+  border-color: rgba(240,208,128,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+.poem-item.active {
+  background: rgba(240,208,128,0.08);
+  border-color: rgba(240,208,128,0.3);
+}
+
+.poem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.poem-title {
+  font-size: 19px;
+  color: #f0d080;
+  letter-spacing: 1px;
+}
+.poem-category {
+  font-size: 12px;
+  color: #888;
+  background: rgba(255,255,255,0.06);
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.poem-preview {
+  font-size: 15px;
+  color: #7a7060;
+  margin-top: 10px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+.poem-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.tag {
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: rgba(240,208,128,0.1);
+  color: #c8a850;
+  border: 1px solid rgba(240,208,128,0.15);
+}
+
+/* ── 展开详情 ── */
+.poem-detail {
+  display: none;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.poem-item.active .poem-detail { display: block; }
+
+.detail-content {
+  font-size: 17px;
+  line-height: 2.2;
+  color: #e0d8c8;
+  white-space: pre-line;
+  margin-bottom: 16px;
+}
+.detail-note {
+  font-size: 13px;
+  color: #888;
+  background: rgba(255,255,255,0.04);
+  padding: 12px 16px;
+  border-radius: 10px;
+  border-left: 3px solid rgba(240,208,128,0.4);
+}
+.detail-note::before { content: "📝 "; }
+
+/* ── 空状态 ── */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #555;
+  font-size: 15px;
+}
+
+/* ── 计数 ── */
+.result-count {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px 10px;
+  font-size: 12px;
+  color: #555;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>李白诗选</h1>
+  <p>唐代 · 三十首精选</p>
+</header>
+
+<div style="padding: 24px 20px 0; max-width:700px; margin:0 auto;">
+  <div class="search-bar">
+    <input id="searchInput" type="text" placeholder="搜索标题、诗句或标签…" autocomplete="off">
+    <select id="filterTag">
+      <option value="">全部体裁</option>
+      <option value="五言绝句">五言绝句</option>
+      <option value="七言绝句">七言绝句</option>
+      <option value="五言律诗">五言律诗</option>
+      <option value="七言古诗">七言古诗</option>
+      <option value="五言古诗">五言古诗</option>
+      <option value="乐府">乐府</option>
+      <option value="四言">四言</option>
+    </select>
+  </div>
+</div>
+
+<div class="result-count" id="resultCount"></div>
+<div id="poemList"></div>
+
+<script>
+// ── 数据（内嵌 poems.json 内容）─
+const POEMS = [
+  {"id":1,"title":"静夜思","category":"五言绝句","content":"床前明月光，疑是地上霜。举头望明月，低头思故乡。","tags":["思乡","明月"],"note":"最著名的思乡诗，传诵千年"},
+  {"id":2,"title":"望庐山瀑布","category":"七言绝句","content":"日照香炉生紫烟，遥看瀑布挂前川。飞流直下三千尺，疑是银河落九天。","tags":["山水","瀑布"],"note":"描写庐山瀑布的传世名作"},
+  {"id":3,"title":"早发白帝城","category":"七言绝句","content":"朝辞白帝彩云间，千里江陵一日还。两岸猿声啼不住，轻舟已过万重山。","tags":["送别","水路"],"note":"写于流放途中遇赦返回"},
+  {"id":4,"title":"赠汪伦","category":"七言绝句","content":"李白乘舟将欲行，忽闻岸上踏歌声。桃花潭水深千尺，不及汪伦送我情。","tags":["送别","友情"],"note":"汪伦是李白的好友，以酿酒待客闻名"},
+  {"id":5,"title":"黄鹤楼送孟浩然之广陵","category":"七言绝句","content":"故人西辞黄鹤楼，烟花三月下扬州。孤帆远影碧空尽，唯见长江天际流。","tags":["送别","友情"],"note":"李白与孟浩然友谊深厚"},
+  {"id":6,"title":"夜泊牛渚怀古","category":"五言古诗","content":"牛渚西江夜，青天无片云。登舟望秋月，空忆谢将军。余亦能高咏，斯人不可闻。明朝挂帆去，枫叶落纷纷。","tags":["怀古","咏史"],"note":"怀念东晋谢尚将军，感叹知音难遇"},
+  {"id":7,"title":"将进酒","category":"乐府","content":"君不见黄河之水天上来，奔流到海不复回。君不见高堂明镜悲白发，朝如青丝暮成雪。人生得意须尽欢，莫使金樽空对月。天生我材必有用，千金散尽还复来。","tags":["饮酒","豪放","人生"],"note":"李白最著名的饮酒诗，豪放旷达"},
+  {"id":8,"title":"蜀道难","category":"乐府","content":"噫吁嚱，危乎高哉！蜀道之难，难于上青天！蚕丛及鱼凫，开国何茫然！尔来四万八千岁，不与秦塞通人烟。","tags":["山水","险峻","蜀道"],"note":"李白描写蜀道最雄奇的作品"},
+  {"id":9,"title":"行路难·其一","category":"乐府","content":"金樽清酒斗十千，玉盘珍羞直万钱。停杯投箸不能食，拔剑四顾心茫然。欲渡黄河冰塞川，将登太行雪满山。长风破浪会有时，直挂云帆济沧海。","tags":["壮志","仕途","励志"],"note":"李白政治失意时的抒怀之作"},
+  {"id":10,"title":"行路难·其二","category":"乐府","content":"大道如青天，我独不得出。羞逐长安社中儿，赤鸡白狗赌梨栗。弹剑作歌奏苦声，曳裾王门不称情。","tags":["仕途","抒怀"],"note":"感叹仕途艰难，怀才不遇"},
+  {"id":11,"title":"月下独酌·其一","category":"五言古诗","content":"花间一壶酒，独酌无相亲。举杯邀明月，对影成三人。月既不解饮，影徒随我身。暂伴月将影，行乐须及春。","tags":["饮酒","孤独","明月"],"note":"以酒会友，以月为伴，旷世孤独"},
+  {"id":12,"title":"把酒问月","category":"乐府","content":"青天有月来几时？我今停杯一问之。人攀明月不可得，月行却与人相随。今人不见古时月，今月曾经照古人。","tags":["明月","饮酒","哲理"],"note":"以月为媒介探讨时空永恒"},
+  {"id":13,"title":"庐山谣寄卢侍御虚舟","category":"七言古诗","content":"我本楚狂人，凤歌笑孔丘。手持绿玉杖，朝别黄鹤楼。五岳寻仙不辞远，一生好入名山游。","tags":["山水","求仙","隐逸"],"note":"李白晚年游庐山，表达求仙访道之志"},
+  {"id":14,"title":"宣州谢朓楼饯别校书叔云","category":"七言古诗","content":"弃我去者昨日之日不可留，乱我心者今日之日多烦忧。长风万里送秋雁，对此可以酣高楼。抽刀断水水更流，举杯消愁愁更愁。","tags":["送别","抒怀","壮志"],"note":"与叔云分别，抒发怀才不遇之感"},
+  {"id":15,"title":"春夜宴桃李园序","category":"四言","content":"夫天地者，万物之逆旅也；光阴者，百代之过客也。而浮生若梦，为欢几何？","tags":["宴会","人生","及时行乐"],"note":"李白与诸弟春夜宴饮，序文华丽"},
+  {"id":16,"title":"渡荆门送别","category":"五言律诗","content":"渡远荆门外，来从楚国游。山随平野尽，江入大荒流。月下飞天镜，云生结海楼。仍怜故乡水，万里送行舟。","tags":["送别","山水","思乡"],"note":"李白出蜀时所作，借水抒情思乡"},
+  {"id":17,"title":"送友人","category":"五言律诗","content":"青山横北郭，白水绕东城。此地一为别，孤蓬万里征。浮云游子意，落日故人情。挥手自兹去，萧萧班马鸣。","tags":["送别","友情"],"note":"以浮云喻游子，以落日喻故情"},
+  {"id":18,"title":"听蜀僧濬弹琴","category":"五言律诗","content":"蜀僧抱绿绮，西下峨眉峰。为我一挥手，如听万壑松。客心洗流水，余响入霜钟。不觉碧山暮，秋云暗几重。","tags":["音乐","友情"],"note":"听琴诗，以流水喻琴音"},
+  {"id":19,"title":"子夜吴歌·秋歌","category":"乐府","content":"长安一片月，万户捣衣声。秋风吹不尽，总是玉关情。何日平胡虏，良人罢远征？","tags":["战争","闺怨","思念"],"note":"写长安女子思念远征丈夫"},
+  {"id":20,"title":"子夜吴歌·冬歌","category":"乐府","content":"明朝驿使发，一夜絮征袍。素手抽针冷，那堪把剪刀。裁缝寄远道，几日到临洮？","tags":["闺怨","战争","思念"],"note":"写女子连夜为征夫赶制冬衣"},
+  {"id":21,"title":"玉阶怨","category":"五言绝句","content":"玉阶生白露，夜久侵罗袜。却下水晶帘，玲珑望秋月。","tags":["宫怨","闺怨"],"note":"写宫女秋夜望月之怨"},
+  {"id":22,"title":"怨情","category":"五言绝句","content":"美人卷珠帘，深坐蹙蛾眉。但见泪痕湿，不知心恨谁。","tags":["闺怨"],"note":"写美人思念不知心恨谁"},
+  {"id":23,"title":"越中览古","category":"七言绝句","content":"越王勾践破吴归，义士还家尽锦衣。宫女如花满春殿，只今惟有鹧鸪飞。","tags":["怀古","咏史"],"note":"越王勾践灭吴后宫殿繁华，如今只剩鹧鸪飞"},
+  {"id":24,"title":"苏台览古","category":"七言绝句","content":"旧苑荒台杨柳新，菱歌清唱不胜春。只今惟有西江月，曾照吴王宫里人。","tags":["怀古","咏史"],"note":"苏州古迹怀古，感叹世事变迁"},
+  {"id":25,"title":"乌栖曲","category":"乐府","content":"姑苏台上乌栖时，吴王宫里醉西施。吴歌楚舞欢未毕，青山欲衔半边日。","tags":["怀古","咏史"],"note":"写吴王夫差与西施的享乐"},
+  {"id":26,"title":"山中问答","category":"七言绝句","content":"问余何意栖碧山，笑而不答心自闲。桃花流水窅然去，别有天地非人间。","tags":["隐逸","山水"],"note":"写隐居山中的悠闲自得"},
+  {"id":27,"title":"采莲曲","category":"七言绝句","content":"若耶溪傍采莲女，笑隔荷花共人语。日照新妆水底明，风飘香袂空中举。","tags":["山水","少女"],"note":"写采莲女的生动画面"},
+  {"id":28,"title":"白鸠辞","category":"乐府","content":"辞宫闲征烧火筒，弯弧惧我猿穴侧。走马锻剑非我所，三年吹怨满铜山。","tags":["咏物","抒怀"],"note":"李白咏物抒怀之作"},
+  {"id":29,"title":"清平调·其一","category":"七言绝句","content":"云想衣裳花想容，春风拂槛露华浓。若非群玉山头见，会向瑶台月下逢。","tags":["宫廷","赞美"],"note":"李白在宫中所作，赞杨贵妃之美"},
+  {"id":30,"title":"劳劳亭","category":"五言绝句","content":"天下伤心处，劳劳送客亭。春风知别苦，不遣柳条青。","tags":["送别"],"note":"以春风不知别苦，反衬人间离别之苦"}
+];
+
+let activeId = null;
+
+function render(list) {
+  const container = document.getElementById('poemList');
+  const countEl = document.getElementById('resultCount');
+
+  if (list.length === 0) {
+    container.innerHTML = '<div class="empty">没有找到匹配的诗</div>';
+    countEl.textContent = '';
+    return;
+  }
+
+  countEl.textContent = `共 ${list.length} 首`;
+
+  container.innerHTML = list.map(p => `
+    <div class="poem-item${activeId === p.id ? ' active' : ''}" data-id="${p.id}">
+      <div class="poem-header">
+        <div class="poem-title">${p.title}</div>
+        <div class="poem-category">${p.category}</div>
+      </div>
+      <div class="poem-preview">${p.content.slice(0, 28)}…</div>
+      <div class="poem-tags">${p.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      <div class="poem-detail">
+        <div class="detail-content">${p.content}</div>
+        <div class="detail-note">${p.note}</div>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.poem-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = parseInt(el.dataset.id);
+      activeId = activeId === id ? null : id;
+      render(getFiltered());
+    });
+  });
+}
+
+function getFiltered() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cat = document.getElementById('filterTag').value;
+  return POEMS.filter(p => {
+    const matchQ = !q || p.title.toLowerCase().includes(q)
+      || p.content.toLowerCase().includes(q)
+      || p.tags.some(t => t.toLowerCase().includes(q));
+    const matchCat = !cat || p.category === cat;
+    return matchQ && matchCat;
+  });
+}
+
+document.getElementById('searchInput').addEventListener('input', () => render(getFiltered()));
+document.getElementById('filterTag').addEventListener('change', () => render(getFiltered()));
+
+render(POEMS);
+</script>
+</body>
+</html>
